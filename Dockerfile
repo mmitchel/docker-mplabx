@@ -18,7 +18,7 @@ RUN curl -fSL -A "Mozilla/4.0" -o /tmp/xc8.run "http://www.microchip.com/mplabxc
     && /tmp/xc8.run --mode unattended --unattendedmodeui none \
         --netservername localhost --LicenseType FreeMode --prefix /opt/microchip/xc8 \
     && rm /tmp/xc8.run
-ENV PATH /opt/microchip/xc8/bin:$PATH
+ENV PATH $PATH:/opt/microchip/xc8/bin
 
 # Download and Install XC16 Compiler, Current Version
 RUN curl -fSL -A "Mozilla/4.0" -o /tmp/xc16.run "http://www.microchip.com/mplabxc16linux" \
@@ -26,7 +26,7 @@ RUN curl -fSL -A "Mozilla/4.0" -o /tmp/xc16.run "http://www.microchip.com/mplabx
     && /tmp/xc16.run --mode unattended --unattendedmodeui none \
         --netservername localhost --LicenseType FreeMode --prefix /opt/microchip/xc16 \
     && rm /tmp/xc16.run
-ENV PATH /opt/microchip/xc16/bin:$PATH
+ENV PATH $PATH:/opt/microchip/xc16/bin
 
 # Download and Install XC32 Compiler, Current Version
 RUN curl -fSL -A "Mozilla/4.0" -o /tmp/xc32.run "http://www.microchip.com/mplabxc32linux" \
@@ -34,7 +34,7 @@ RUN curl -fSL -A "Mozilla/4.0" -o /tmp/xc32.run "http://www.microchip.com/mplabx
     && /tmp/xc32.run --mode unattended --unattendedmodeui none \
         --netservername localhost --LicenseType FreeMode --prefix /opt/microchip/xc32 \
     && rm /tmp/xc32.run
-ENV PATH /opt/microchip/xc32/bin:$PATH
+ENV PATH $PATH:/opt/microchip/xc32/bin
 
 # Download and Install MPLABX IDE, Current Version
 RUN curl -fSL -A "Mozilla/4.0" -o /tmp/mplabx-installer.tar "http://www.microchip.com/mplabx-ide-linux-installer" \
@@ -42,15 +42,19 @@ RUN curl -fSL -A "Mozilla/4.0" -o /tmp/mplabx-installer.tar "http://www.microchi
     && USER=root ./*-installer.sh --nox11 \
         -- --unattendedmodeui none --mode unattended --installdir /opt/microchip/mplabx \
     && rm ./*-installer.sh
-ENV PATH /opt/microchip/mplabx/mplab_ide/bin:$PATH
+ENV PATH $PATH:/opt/microchip/mplabx/mplab_ide/bin
+VOLUME /tmp/.X11-unix
 
-# Exported Volumes
-RUN useradd developer \
-    && mkdir -p /home/developer/MPLABXProjects \
-    && touch /home/developer/MPLABXProjects/.directory \
-    && chown developer:developer /home/developer/MPLABXProjects
-VOLUME /home/developer/MPLABXProjects
+# Container Developer User Ident
+RUN useradd user \
+    && mkdir -p /home/user/MPLABXProjects \
+    && touch /home/user/MPLABXProjects/.directory \
+    && chown user:user /home/user/MPLABXProjects \
+VOLUME /home/user/MPLABXProjects
 
-# Exported Volumes for MPLABX IDE, Local Use
-VOLUME ["/tmp/.X11-unix"]
+# Container Tool Version Reports
+RUN [ -x /opt/microchip/xc8/bin/xc8 ] && xc8 --ver
+RUN [ -x /opt/microchip/xc16/bin/xc16-gcc ] && xc16-gcc --version
+RUN [ -x /opt/microchip/xc32/bin/xc32-gcc ] && xc32-gcc --version
+
 #CMD ["/opt/microchip/mplabx/mplab_ide/bin/mplab_ide"]
