@@ -84,6 +84,7 @@ RUN [ -x /opt/microchip/xc32/bin/xc32-gcc ] && xc32-gcc --version
 # docker run -it -e LOCAL_USER_ID=`id -u $USER` docker-image
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod a+x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
