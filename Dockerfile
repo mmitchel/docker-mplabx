@@ -29,7 +29,9 @@ RUN dpkg --add-architecture i386 \
     && apt-get install -y -qq --no-install-recommends build-essential \
     bzip2 cpio git p7zip-full python ragel sudo unzip vim \
     libc6:i386 libx11-6:i386 libxext6:i386 libstdc++6:i386 libexpat1:i386 \
-    libxext6 libxrender1 libxtst6 libgtk2.0-0 libxslt1.1 libncurses5-dev
+    libxext6 libxrender1 libxtst6 libgtk2.0-0 libxslt1.1 libncurses5-dev \
+    autoconf automake bison flex gcc-multilib g++-multilib texinfo zip \
+    zlib1g-dev zlib1g-dev:i386
 
 # Removed
 #   && apt-get upgrade -y -qq
@@ -60,6 +62,16 @@ RUN curl -fsSL -A "Mozilla/4.0" -o /tmp/xc8.run "http://www.microchip.com/mplabx
 VOLUME /tmp/.X11-unix
 
 ENV PATH /opt/microchip/mplabx/mplab_ide/bin:/opt/microchip/xc8/bin:/opt/microchip/xc16/bin:/opt/microchip/xc32/bin:$PATH
+
+# Download Build Artifacts to Update from Open Source Archive
+
+RUN curl -fsSL -A "Mozilla/4.0" -o artifacts.zip \
+    "https://gitlab.com/mmitchel/microchip-xc16/builds/artifacts/build_linux/download?job=build_xc16" \
+    && unzip artifacts.zip \
+    && mv /opt/microchip/xc16/bin/bin/elf-cc1 /opt/microchip/xc16/bin/bin/elf-cc1.orig \
+    && cp install/bin/bin/elf-cc1 /opt/microchip/xc16/bin/bin/elf-cc1 \
+    && chmod +x /opt/microchip/xc16/bin/bin/elf-cc1 \
+    && rm -fr artifacts.zip build_output.txt install 
 
 #CMD ["/opt/microchip/mplabx/mplab_ide/bin/mplab_ide"]
 
