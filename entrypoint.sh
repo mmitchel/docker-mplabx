@@ -6,8 +6,9 @@
 
 USER_ID=${LOCAL_USER_ID:-9001}
 echo "Starting with UID : $USER_ID"
-useradd --shell /bin/bash -u $USER_ID -o -c "" -m user
-#useradd --shell /bin/bash -u $USER_ID -o -c "" -m -G sudo user
+#useradd --shell /bin/bash -u $USER_ID -o -c "" -m user
+useradd --shell /bin/bash -u $USER_ID -o -c "" -m -p PASSWORD -G sudo user
+chown user /MPLABXProjects
 export HOME=/home/user
 cd $HOME
 exec /usr/local/bin/gosu user "$@"
